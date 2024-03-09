@@ -51,7 +51,7 @@ pub const Lexer = struct {
     }
 
     // Return the next token.
-    fn getToken(self: *Self) !Token {
+    pub fn getToken(self: *Self) Token {
         self.skipWhiteSpace();
         self.skipComment();
 
@@ -111,6 +111,7 @@ pub const Lexer = struct {
                     if (self.cur_char == '\\' or self.cur_char == '\r' or self.cur_char == '\n' or self.cur_char == '\t' or self.cur_char == '%') {
                         panic("Lexer Error: Illegal character in string: '{s}'", .{self.source[start .. self.cur_pos + 1]});
                     }
+                    self.nextChar();
                 }
                 break :blk Token.init(self.source[start .. self.cur_pos + 1], TokenKind.string);
             },
@@ -153,7 +154,7 @@ pub const Lexer = struct {
     }
 };
 
-const Token = struct {
+pub const Token = struct {
     const Self = @This();
     text: []const u8,
     kind: TokenKind,
@@ -175,7 +176,7 @@ const Token = struct {
     }
 };
 
-const TokenKind = enum(u16) {
+pub const TokenKind = enum(u16) {
     eof = 0,
     newline,
     number,
