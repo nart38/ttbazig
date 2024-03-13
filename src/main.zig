@@ -31,6 +31,7 @@ pub fn main() !void {
     };
 
     const source: []const u8 = try text.toOwnedSlice();
+    defer allocator.free(source);
 
     // Initialize lexer and parser.
     var lex = lexer.Lexer.init(source);
@@ -41,6 +42,5 @@ pub fn main() !void {
     defer pars.deinit();
     try pars.program();
     try pars.emitter.writeFile();
-    std.debug.print("Parsing completed\n", .{});
-    // TODO: resolve memory leak.
+    std.debug.print("Compilation completed with no error.\n", .{});
 }

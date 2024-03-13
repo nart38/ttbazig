@@ -153,7 +153,6 @@ pub const Parser = struct {
 
             // "LABEL" ident
             .LABEL => {
-                std.debug.print("STATEMENT-LABEL\n", .{});
                 self.nextToken();
 
                 if (self.labels_declared.contains(self.cur_token.text))
@@ -167,7 +166,6 @@ pub const Parser = struct {
 
             // "GOTO" ident
             .GOTO => {
-                std.debug.print("STATEMENT-GOTO\n", .{});
                 self.nextToken();
                 try self.labels_gotoed.insert(self.cur_token.text);
                 self.emitter.emit("goto");
@@ -178,7 +176,6 @@ pub const Parser = struct {
 
             // "LET" ident "=" expression
             .LET => {
-                std.debug.print("STATEMENT-LET\n", .{});
                 self.nextToken();
 
                 if (!self.symbols.contains(self.cur_token.text)) {
@@ -199,7 +196,6 @@ pub const Parser = struct {
 
             // "INPUT" ident
             .INPUT => {
-                std.debug.print("STATEMENT-INPUT\n", .{});
                 self.nextToken();
 
                 if (!self.symbols.contains(self.cur_token.text))
@@ -227,8 +223,6 @@ pub const Parser = struct {
 
     // comparison ::= expression (("==" | "!=" | ">" | ">=" | "<" | "<=") expression)+
     fn comparison(self: Self) void {
-        std.debug.print("STATEMENT-INPUT\n", .{});
-
         self.expression();
         if (self.isComparisonOperator()) {
             self.emitter.emit(self.cur_token.text);
@@ -247,8 +241,6 @@ pub const Parser = struct {
 
     // expression ::= term {( "-" | "+" ) term}
     fn expression(self: Self) void {
-        std.debug.print("EXPRESSION\n", .{});
-
         self.term();
         while (self.checkToken(lexer.TokenKind.plus) or self.checkToken(lexer.TokenKind.minus)) {
             self.emitter.emit(self.cur_token.text);
@@ -259,8 +251,6 @@ pub const Parser = struct {
 
     // term ::= unary {( "/" | "*" ) unary}
     fn term(self: Self) void {
-        std.debug.print("TERM\n", .{});
-
         self.unary();
         while (self.checkToken(lexer.TokenKind.asterisk) or self.checkToken(lexer.TokenKind.slash)) {
             self.emitter.emit(self.cur_token.text);
@@ -271,7 +261,6 @@ pub const Parser = struct {
 
     // unary ::= ["+" | "-"] primary
     fn unary(self: Self) void {
-        std.debug.print("UNARY\n", .{});
         if (self.checkToken(lexer.TokenKind.plus) or self.checkToken(lexer.TokenKind.minus)) {
             self.emitter.emit(self.cur_token.text);
             self.nextToken();
@@ -282,8 +271,6 @@ pub const Parser = struct {
 
     // primary ::= number | ident
     fn primary(self: Self) void {
-        std.debug.print("PRIMARY ({s})\n", .{self.cur_token.text});
-
         switch (self.cur_token.kind) {
             .number => {
                 self.emitter.emit(self.cur_token.text);
@@ -302,7 +289,6 @@ pub const Parser = struct {
 
     // nl ::= '\n'+
     fn nl(self: Self) void {
-        std.debug.print("NEWLINE\n", .{});
         self.match(lexer.TokenKind.newline);
         while (self.checkToken(lexer.TokenKind.newline)) {
             self.nextToken();

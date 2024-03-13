@@ -6,12 +6,14 @@ const panic = std.debug.panic;
 pub const Emitter = struct {
     const Self = @This();
 
+    allocator: Allocator,
     full_path: []const u8,
     header: ArrayList(u8),
     code: ArrayList(u8),
 
     pub fn init(a: Allocator, full_path: []const u8) Emitter {
         return Emitter{
+            .allocator = a,
             .full_path = full_path,
             .header = ArrayList(u8).init(a),
             .code = ArrayList(u8).init(a),
@@ -57,7 +59,9 @@ pub const Emitter = struct {
         const file = try std.fs.cwd().createFile(self.full_path, .{});
         defer file.close();
         const header = try self.header.toOwnedSlice();
+        defer self.allocator.free(header);
         const code = try self.code.toOwnedSlice();
+        defer self.allocator.free(code);
         try file.writeAll(header);
         try file.writeAll(code);
     }
