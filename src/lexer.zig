@@ -113,7 +113,7 @@ pub const Lexer = struct {
                     }
                     self.nextChar();
                 }
-                break :blk Token.init(self.source[start .. self.cur_pos + 1], TokenKind.string);
+                break :blk Token.init(self.source[start..self.cur_pos], TokenKind.string);
             },
 
             '0'...'9' => blk: {

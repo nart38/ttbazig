@@ -4,6 +4,7 @@ const std = @import("std");
 const panic = std.debug.panic;
 const lexer = @import("lexer.zig");
 const parser = @import("parser.zig");
+const emitter = @import("emit.zig");
 
 pub fn main() !void {
     var gpa = std.heap.GeneralPurposeAllocator(.{}){};
@@ -33,9 +34,13 @@ pub fn main() !void {
 
     // Initialize lexer and parser.
     var lex = lexer.Lexer.init(source);
-    var pars = parser.Parser.init(allocator, lex);
+    var emit = emitter.Emitter.init(allocator, "out.c");
+    defer emit.deinit();
+
+    var pars = parser.Parser.init(allocator, lex, emit);
     defer pars.deinit();
     try pars.program();
+    try pars.emitter.writeFile();
     std.debug.print("Parsing completed\n", .{});
     // TODO: resolve memory leak.
 }
